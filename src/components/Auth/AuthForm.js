@@ -51,8 +51,9 @@ const AuthForm = () => {
       callApi(signInUrl, "POST", payload)
         .then((res) => {
           const idToken = res.data.idToken;
+          const expiresIn = new Date().getTime() + res.data.expiresIn * 1000;
           setWarningText("Sign in success");
-          login(idToken);
+          login(idToken, expiresIn);
           history.replace("/");
         })
         .catch((error) => {
