@@ -1,13 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import classes from "./AuthForm.module.css";
 import { AUTH_URL } from "./../../constants/constants";
 import callApi from "./../../utils/callApi";
+import { AuthContext } from "./../../store/auth-context";
+import { useHistory } from "react-router-dom";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [warningText, setWarningText] = useState("");
   const emailRef = useRef();
   const passwordRef = useRef();
+  const authCxt = useContext(AuthContext);
+  const history = useHistory();
+  const { login } = authCxt;
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -45,10 +50,10 @@ const AuthForm = () => {
       const signInUrl = AUTH_URL("signInWithPassword");
       callApi(signInUrl, "POST", payload)
         .then((res) => {
-          console.log("then");
           const idToken = res.data.idToken;
-          localStorage.setItem("idToken", idToken);
           setWarningText("Sign in success");
+          login(idToken);
+          history.replace("/");
         })
         .catch((error) => {
           const res = error.response;
